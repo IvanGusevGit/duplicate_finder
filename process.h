@@ -18,7 +18,11 @@ public:
 
     void add_group(qint64 id, std::vector<QString> const &files);
 
+    void add_errrors(std::vector<QString> const &errors);
+
     void set_process_bar_visible(bool visible);
+
+    void set_errors_visible(bool visible);
 
 private slots:
 
@@ -30,9 +34,6 @@ private slots:
 
 private:
     std::unique_ptr<Ui::process> ui;
-
-    quint64 limit;
-    quint64 current_status = 0;
 
 };
 

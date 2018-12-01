@@ -107,13 +107,23 @@ void main_widget::show_result(std::vector<std::vector<QString>> const & groups) 
     for (std::vector<QString> group : groups) {
         process_widget->add_group(group_number++, group);
     }
+    if (errors.size() != 0) {
+        process_widget->add_errrors(errors);
+        process_widget->set_errors_visible(true);
+    }
     process_widget->set_process_bar_visible(false);
 }
 
 std::vector<QString> main_widget::get_roots() {
     std::vector<QString> roots;
     for (int32_t i = 0; i < ui->directories->count(); ++i) {
-        roots.push_back(ui->directories->item(i)->text());
+        QString current_directory = ui->directories->item(i)->text();
+        QDir directory(current_directory);
+        if (!directory.exists() || !directory.isReadable()) {
+            errors.push_back("Unable to access \"" + current_directory + "\" directory");
+        }
+        roots.push_back(current_directory);
     }
     return roots;
 }
+

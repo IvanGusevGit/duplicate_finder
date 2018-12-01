@@ -16,8 +16,10 @@ process::process(QWidget *parent) :
 
     ui->result_tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->result_tree->setUniformRowHeights(true);
-
     ui->result_tree->header()->resizeSection(0, 1000);
+
+    ui->errors_tree->setVisible(false);
+
     this->setGeometry(
         QStyle::alignedRect(
             Qt::LeftToRight,
@@ -64,11 +66,24 @@ void process::delete_selected_files()
 }
 
 void process::set_limit(quint64 limit) {
-    this->limit = limit;
+   ui->progress_bar->setRange(0, limit);
 }
 
 void process::increase_status(size_t t) {
-    current_status += t;
-    ui->progress_bar->setValue(current_status * 100 / limit);
+
+    ui->progress_bar->setValue(ui->progress_bar->value() + t);
+}
+
+void process::add_errrors(std::vector<QString> const &errors) {
+    for (QString error : errors) {
+        std::unique_ptr<QTreeWidgetItem> header_item = std::make_unique<QTreeWidgetItem>(ui->errors_tree);
+        header_item->setExpanded(true);
+        header_item->setText(0, error);
+        header_item.release();
+    }
+}
+
+void process::set_errors_visible(bool visible) {
+    ui->errors_tree->setVisible(visible);
 }
 

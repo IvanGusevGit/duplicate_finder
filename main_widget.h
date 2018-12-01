@@ -47,6 +47,8 @@ private:
     std::unique_ptr<Ui::main_widget> ui;
     std::unique_ptr<process> process_widget;
     synchronized_scanner* scanner;
+    std::vector<QString> errors;
+
 
 };
 

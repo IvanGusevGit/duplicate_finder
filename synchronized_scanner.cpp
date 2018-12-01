@@ -22,6 +22,7 @@ void synchronized_scanner::run() {
 
 
 std::vector<QString> synchronized_scanner::scan_directories() {
+
     std::unordered_map<qint64, std::unique_ptr<std::vector<QString>>> files;
     quint64 files_counter = 0;
     for (QString current_directory_path : directories) {
@@ -38,9 +39,9 @@ std::vector<QString> synchronized_scanner::scan_directories() {
         }
     }
 
+    std::vector<QString> filtered_files;
     emit files_number(files_counter);
     size_t skipped = 0;
-    std::vector<QString> filtered_files;
     for (auto it = files.begin(); it != files.end(); it++) {
         if (it->second->size() > 1) {
             for (QString file_path : *(it->second)) {
@@ -50,7 +51,6 @@ std::vector<QString> synchronized_scanner::scan_directories() {
             skipped++;
         }
     }
-
     emit hashed_file(skipped);
 
     return filtered_files;

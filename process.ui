@@ -6,21 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>706</width>
-    <height>362</height>
+    <width>776</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QProgressBar" name="progress_bar">
-     <property name="value">
-      <number>24</number>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="QTreeWidget" name="result_tree">
      <column>
@@ -35,11 +28,27 @@
      </column>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QPushButton" name="delete_selected_button">
      <property name="text">
       <string>Delete</string>
      </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QProgressBar" name="progress_bar">
+     <property name="value">
+      <number>24</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTreeWidget" name="errors_tree">
+     <column>
+      <property name="text">
+       <string>Errors</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>
