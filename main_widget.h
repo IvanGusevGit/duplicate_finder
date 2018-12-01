@@ -32,6 +32,10 @@ private slots:
 
     void show_result(std::vector<std::vector<QString>> const & groups);
 
+signals:
+
+    void return_to_main();
+
 private:
 
     void show_message(QString message);
