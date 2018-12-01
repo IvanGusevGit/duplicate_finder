@@ -97,9 +97,7 @@ void synchronized_scanner::calc_file_hash(std::pair<QByteArray, QString>* result
     QFile file(result->second);
     QCryptographicHash hash(QCryptographicHash::Sha256);
     if (file.open(QFile::ReadOnly)) {
-        while (!file.atEnd()) {
-            hash.addData(file.read(8192));
-        }
+        hash.addData(&file);
     }
     result->first = hash.result().toHex();
 }
