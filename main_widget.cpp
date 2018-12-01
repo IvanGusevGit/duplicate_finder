@@ -121,8 +121,9 @@ std::vector<QString> main_widget::get_roots() {
         QDir directory(current_directory);
         if (!directory.exists() || !directory.isReadable()) {
             errors.push_back("Unable to access \"" + current_directory + "\" directory");
+        } else {
+            roots.push_back(current_directory);
         }
-        roots.push_back(current_directory);
     }
     return roots;
 }
