@@ -20,7 +20,7 @@
 main_widget::main_widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::main_widget),
-    process_widget(std::make_unique<process>())
+    process_widget(new process())
 {
     ui->setupUi(this);
     ui->message_label->setVisible(false);
@@ -94,11 +94,11 @@ void main_widget::validate_start()
 }
 
 void main_widget::start_search() {
-    scanner = std::make_unique<synchronized_scanner>(get_roots());
-    connect(scanner.get(), SIGNAL(finished_search(std::vector<std::vector<QString>> const &)), this, SLOT(show_result(std::vector<std::vector<QString>> const &)));
-    connect(scanner.get(), SIGNAL(files_number(quint64)), process_widget.get(), SLOT(set_limit(quint64)));
-    connect(scanner.get(), SIGNAL(hashed_file(size_t)), process_widget.get(), SLOT(increase_status(size_t)));
-    connect(scanner.get(), SIGNAL(finished()), scanner.get(), SLOT(deleteLater()));
+    scanner = new synchronized_scanner(get_roots());
+    connect(scanner, SIGNAL(finished_search(std::vector<std::vector<QString>> const &)), this, SLOT(show_result(std::vector<std::vector<QString>> const &)));
+    connect(scanner, SIGNAL(files_number(quint64)), process_widget.get(), SLOT(set_limit(quint64)));
+    connect(scanner, SIGNAL(hashed_file(size_t)), process_widget.get(), SLOT(increase_status(size_t)));
+    connect(scanner, SIGNAL(finished()), scanner, SLOT(deleteLater()));
     scanner->start();
 }
 

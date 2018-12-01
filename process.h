@@ -29,7 +29,7 @@ private slots:
     void increase_status(size_t t);
 
 private:
-    std::unique_ptr<Ui::process> ui;
+    Ui::process* ui;
 
     quint64 limit;
     quint64 current_status = 0;

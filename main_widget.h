@@ -46,7 +46,7 @@ private:
 
     std::unique_ptr<Ui::main_widget> ui;
     std::unique_ptr<process> process_widget;
-    std::unique_ptr<synchronized_scanner> scanner;
+    synchronized_scanner* scanner;
 
 };
 

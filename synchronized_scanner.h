@@ -45,7 +45,7 @@ private:
 
 private:
 
-    static size_t const THREADS_NUMBER = 5;
+    static size_t const THREADS_NUMBER = 10;
 
     std::vector<QString> directories;
     std::unordered_map<QByteArray, std::unique_ptr<std::vector<QString>>> hashes;
