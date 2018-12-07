@@ -2,10 +2,11 @@
 #include "ui_main_widget.h"
 #include <process.h>
 
-#include <QFileDialog>
 #include <unordered_map>
 #include <memory>
 #include <iostream>
+
+#include <QFileDialog>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -19,8 +20,7 @@
 
 main_widget::main_widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::main_widget),
-    process_widget(new process())
+    ui(new Ui::main_widget)
 {
     ui->setupUi(this);
     ui->message_label->setVisible(false);
@@ -34,7 +34,6 @@ main_widget::main_widget(QWidget *parent) :
             qApp->desktop()->availableGeometry()
         )
     );
-
     connect(ui->select_directory_button, SIGNAL(clicked(bool)), this, SLOT(select_directory()));
     connect(ui->remove_directory_button, SIGNAL(clicked(bool)), this, SLOT(remove_directory()));
     connect(ui->add_directory_button, SIGNAL(clicked(bool)), this, SLOT(add_directory()));
@@ -43,15 +42,13 @@ main_widget::main_widget(QWidget *parent) :
 
 main_widget::~main_widget() {}
 
-void main_widget::select_directory()
-{
+void main_widget::select_directory() {
     QString directory_path = QFileDialog::getExistingDirectory(this, "Select Directory for Scanning",
                                                     QString(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->path_edit->setText(directory_path);
 }
 
-void main_widget::add_directory()
-{
+void main_widget::add_directory() {
     QString path = ui->path_edit->text();
     if (!QDir(path).exists()) {
         show_message("Dirrectory does not exist");
@@ -77,8 +74,7 @@ void main_widget::show_message(QString message) {
     ui->message_label->setVisible(true);
 }
 
-void main_widget::remove_directory()
-{
+void main_widget::remove_directory() {
     qDeleteAll(ui->directories->selectedItems());
 }
 
@@ -88,18 +84,20 @@ void main_widget::validate_start()
         show_message("No directories were selected");
     } else {
         this->hide();
-        process_widget->show();
         start_search();
     }
 }
 
 void main_widget::start_search() {
+    process_widget = std::make_unique<process>();
     scanner = new synchronized_scanner(get_roots());
     connect(scanner, SIGNAL(finished_search(std::vector<std::vector<QString>> const &)), this, SLOT(show_result(std::vector<std::vector<QString>> const &)));
     connect(scanner, SIGNAL(files_number(quint64)), process_widget.get(), SLOT(set_limit(quint64)));
-    connect(scanner, SIGNAL(hashed_file(size_t)), process_widget.get(), SLOT(increase_status(size_t)));
-    connect(scanner, SIGNAL(finished()), scanner, SLOT(deleteLater()));
+    connect(scanner, SIGNAL(hashed_file(qint64)), process_widget.get(), SLOT(increase_status(qint64)));
+    connect(process_widget.get(), SIGNAL(closure()), this, SLOT(stop_search_and_close()));
+    connect(process_widget.get(), SIGNAL(return_to_main()), this, SLOT(stop_and_reload()));
     scanner->start();
+    process_widget->show();
 }
 
 void main_widget::show_result(std::vector<std::vector<QString>> const & groups) {
@@ -112,6 +110,7 @@ void main_widget::show_result(std::vector<std::vector<QString>> const & groups) 
         process_widget->set_errors_visible(true);
     }
     process_widget->set_process_bar_visible(false);
+    process_widget->set_file_deletetion_enabled(true);
 }
 
 std::vector<QString> main_widget::get_roots() {
@@ -128,3 +127,24 @@ std::vector<QString> main_widget::get_roots() {
     return roots;
 }
 
+void main_widget::stop_search() {
+    scanner->wait();
+    scanner->deleteLater();
+}
+
+void main_widget::stop_search_and_close() {
+    stop_search();
+    close();
+}
+
+void main_widget::stop_and_reload() {
+    stop_search();
+    process_widget->hide();
+    show();
+    process_widget.reset();
+    clear_workspace();
+}
+
+void main_widget::clear_workspace() {
+    ui->directories->clear();
+}

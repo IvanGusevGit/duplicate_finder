@@ -1,16 +1,19 @@
 #include "process.h"
 #include "ui_process.h"
+
 #include <memory>
 #include <QTreeWidgetItem>
 #include <QFile>
 #include <QStyle>
 #include <QDesktopWidget>
+#include <iostream>
 
-process::process(QWidget *parent) :
-    QWidget(parent),
+process::process() :
+    QWidget(0),
     ui(new Ui::process)
 {
     ui->setupUi(this);
+
     ui->progress_bar->setRange(0, 100);
     ui->progress_bar->setValue(0);
 
@@ -19,6 +22,10 @@ process::process(QWidget *parent) :
     ui->result_tree->header()->resizeSection(0, 1000);
 
     ui->errors_tree->setVisible(false);
+
+    ui->delete_selected_button->setEnabled(false);
+
+    current = total = 0;
 
     this->setGeometry(
         QStyle::alignedRect(
@@ -30,7 +37,7 @@ process::process(QWidget *parent) :
     );
 
     connect(ui->delete_selected_button, SIGNAL(clicked(bool)), this, SLOT(delete_selected_files()));
-
+    connect(ui->return_button, SIGNAL(clicked(bool)), this, SLOT(return_to_main_menu()));
 }
 
 process::~process(){}
@@ -66,12 +73,22 @@ void process::delete_selected_files()
 }
 
 void process::set_limit(quint64 limit) {
-   ui->progress_bar->setRange(0, limit);
+    std::cout << "SET LIMIT::" << limit << '\n';
+    std::cout.flush();
+    total = limit;
+    if (limit == 0) {
+        ui->progress_bar->setRange(0, 0);
+    } else {
+        ui->progress_bar->setRange(0, 100);
+    }
 }
-
-void process::increase_status(size_t t) {
-
-    ui->progress_bar->setValue(ui->progress_bar->value() + t);
+void process::increase_status(qint64 t) {
+    std::cout << "PASSED::" << t << '\n';
+    std::cout.flush();
+    current += t;
+    if (total != 0) {
+        ui->progress_bar->setValue(current * 100 / total);
+    }
 }
 
 void process::add_errrors(std::vector<QString> const &errors) {
@@ -87,3 +104,14 @@ void process::set_errors_visible(bool visible) {
     ui->errors_tree->setVisible(visible);
 }
 
+void process::closeEvent(QCloseEvent *event) {
+    emit closure();
+}
+
+void process::set_file_deletetion_enabled(bool enabled) {
+    ui->delete_selected_button->setEnabled(enabled);
+}
+
+void process::return_to_main_menu() {
+    emit return_to_main();
+}

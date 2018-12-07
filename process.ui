@@ -11,12 +11,26 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Duplicate Finder</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(238, 238, 236);</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QProgressBar" name="progress_bar">
+     <property name="value">
+      <number>24</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="delete_selected_button">
+     <property name="text">
+      <string>Delete</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QTreeWidget" name="result_tree">
      <column>
@@ -31,20 +45,6 @@
      </column>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QPushButton" name="delete_selected_button">
-     <property name="text">
-      <string>Delete</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QProgressBar" name="progress_bar">
-     <property name="value">
-      <number>24</number>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QTreeWidget" name="errors_tree">
      <column>
@@ -52,6 +52,13 @@
        <string>Errors</string>
       </property>
      </column>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPushButton" name="return_button">
+     <property name="text">
+      <string>Return to Main Menu</string>
+     </property>
     </widget>
    </item>
   </layout>
