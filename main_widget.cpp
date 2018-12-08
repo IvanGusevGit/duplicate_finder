@@ -148,6 +148,7 @@ void main_widget::stop_and_reload() {
 
 void main_widget::clear_workspace() {
     ui->directories->clear();
+    errors.clear();
 }
 
 void main_widget::catch_file_error(QString file) {
