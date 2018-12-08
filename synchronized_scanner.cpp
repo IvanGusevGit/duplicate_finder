@@ -95,12 +95,18 @@ void synchronized_scanner::calc_file_hash(synchronized_scanner* scanner, std::pa
             hash.addData(chunk);
             scanner->emit_hashed_signal(10240);
         }
+    } else {
+        scanner->emit_file_error(result->second);
     }
     result->first = hash.result();
 }
 
 void synchronized_scanner::emit_hashed_signal(qint64 size) {
     emit hashed_file(size);
+}
+
+void synchronized_scanner::emit_file_error(QString file) {
+    emit file_error(file);
 }
 
 void synchronized_scanner::collect_results(size_t thread_number) {
@@ -116,4 +122,6 @@ void synchronized_scanner::collect_results(size_t thread_number) {
 void synchronized_scanner::stop() {
     stop_flag = true;
 }
+
+
 

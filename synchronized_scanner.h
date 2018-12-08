@@ -28,10 +28,13 @@ public:
 
     void emit_hashed_signal(qint64 size);
 
+    void emit_file_error(QString file);
+
 signals:
     void finished_search(std::vector<std::vector<QString>> const &);
     void files_number(quint64);
     void hashed_file(qint64);
+    void file_error(QString);
 
 protected:
     virtual void run();

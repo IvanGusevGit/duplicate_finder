@@ -108,6 +108,7 @@ void main_widget::start_search() {
     connect(scanner, SIGNAL(finished_search(std::vector<std::vector<QString>> const &)), this, SLOT(show_result(std::vector<std::vector<QString>> const &)));
     connect(scanner, SIGNAL(files_number(quint64)), process_widget.get(), SLOT(set_limit(quint64)));
     connect(scanner, SIGNAL(hashed_file(qint64)), process_widget.get(), SLOT(increase_status(qint64)));
+    connect(scanner, SIGNAL(file_error(QString)), this, SLOT(catch_file_error(QString)));
     connect(process_widget.get(), SIGNAL(closure()), this, SLOT(stop_search_and_close()));
     connect(process_widget.get(), SIGNAL(return_to_main()), this, SLOT(stop_and_reload()));
     scanner->start();
@@ -147,4 +148,8 @@ void main_widget::stop_and_reload() {
 
 void main_widget::clear_workspace() {
     ui->directories->clear();
+}
+
+void main_widget::catch_file_error(QString file) {
+    errors.push_back("Unable to access " + file);
 }

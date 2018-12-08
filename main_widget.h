@@ -36,6 +36,8 @@ private slots:
 
     void stop_and_reload();
 
+    void catch_file_error(QString file);
+
 private:
 
     void show_message(QString message);
