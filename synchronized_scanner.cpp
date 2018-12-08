@@ -41,7 +41,6 @@ std::vector<QString> synchronized_scanner::scan_directories() {
     }
 
     std::vector<QString> filtered_files;
-    (std::cout << size_counter).flush();
     emit files_number(size_counter);
     qint64 skipped = 0;
     for (auto it = files.begin(); it != files.end(); it++) {
@@ -54,8 +53,6 @@ std::vector<QString> synchronized_scanner::scan_directories() {
             skipped += file_parameters.size();
         }
     }
-    std::cout << "SKIPPED::" << skipped << '\n';
-    std::cout.flush();
     emit hashed_file(skipped);
 
     return filtered_files;
@@ -68,26 +65,14 @@ void synchronized_scanner::calc_hashes(std::vector<QString> const  &files) {
             break;
         }
         if (next_thread == THREADS_NUMBER) {
-            for (size_t i = 0; i < THREADS_NUMBER; ++i) {
-                threads[i].join();
-                if (hashes.find(results[i].first) == hashes.end()) {
-                    hashes[results[i].first] = std::make_unique<std::vector<QString>>();
-                }
-                (*hashes[results[i].first]).push_back(results[i].second);
-            }
+            collect_results(THREADS_NUMBER);
             next_thread = 0;
         }
         results[next_thread].second = file_path;
-        threads[next_thread] = std::thread(calc_file_hash, this, &results[next_thread]);
+        threads[next_thread] = std::thread(calc_file_hash, this, &results[next_thread], &stop_flag);
         next_thread++;
     }
-    for (size_t i = 0; i < next_thread; ++i) {
-        threads[i].join();
-        if (hashes.find(results[i].first) == hashes.end()) {
-            hashes[results[i].first] = std::make_unique<std::vector<QString>>();
-        }
-        (*hashes[results[i].first]).push_back(results[i].second);
-    }
+    collect_results(next_thread);
 }
 
 std::vector<std::vector<QString>> synchronized_scanner::filter_results() {
@@ -100,12 +85,12 @@ std::vector<std::vector<QString>> synchronized_scanner::filter_results() {
     return results;
 }
 
-void synchronized_scanner::calc_file_hash(synchronized_scanner* scanner, std::pair<QByteArray, QString>* result) {
+void synchronized_scanner::calc_file_hash(synchronized_scanner* scanner, std::pair<QByteArray, QString>* result, bool* stop_flag) {
     QFile file(result->second);
     QFileInfo parameters(result->second);
     QCryptographicHash hash(QCryptographicHash::Sha256);
     if (file.open(QFile::ReadOnly)) {
-        while (!file.atEnd()) {
+        while (!file.atEnd() && !(*stop_flag)) {
             QByteArray chunk = file.read(10240);
             hash.addData(chunk);
             scanner->emit_hashed_signal(10240);
@@ -116,7 +101,19 @@ void synchronized_scanner::calc_file_hash(synchronized_scanner* scanner, std::pa
 
 void synchronized_scanner::emit_hashed_signal(qint64 size) {
     emit hashed_file(size);
-    std::cout << "HASHED::" << size << '\n';
-    std::cout.flush();
+}
+
+void synchronized_scanner::collect_results(size_t thread_number) {
+    for (size_t i = 0; i < thread_number; ++i) {
+        threads[i].join();
+        if (hashes.find(results[i].first) == hashes.end()) {
+            hashes[results[i].first] = std::make_unique<std::vector<QString>>();
+        }
+        (*hashes[results[i].first]).push_back(results[i].second);
+    }
+}
+
+void synchronized_scanner::stop() {
+    stop_flag = true;
 }
 

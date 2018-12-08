@@ -42,6 +42,11 @@ main_widget::main_widget(QWidget *parent) :
 
 main_widget::~main_widget() {}
 
+void main_widget::show_message(QString message) {
+    ui->message_label->setText(message);
+    ui->message_label->setVisible(true);
+}
+
 void main_widget::select_directory() {
     QString directory_path = QFileDialog::getExistingDirectory(this, "Select Directory for Scanning",
                                                     QString(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -69,9 +74,18 @@ void main_widget::add_directory() {
     }
 }
 
-void main_widget::show_message(QString message) {
-    ui->message_label->setText(message);
-    ui->message_label->setVisible(true);
+std::vector<QString> main_widget::get_roots() {
+    std::vector<QString> roots;
+    for (int32_t i = 0; i < ui->directories->count(); ++i) {
+        QString current_directory = ui->directories->item(i)->text();
+        QDir directory(current_directory);
+        if (!directory.exists() || !directory.isReadable()) {
+            errors.push_back("Unable to access \"" + current_directory + "\" directory");
+        } else {
+            roots.push_back(current_directory);
+        }
+    }
+    return roots;
 }
 
 void main_widget::remove_directory() {
@@ -113,21 +127,8 @@ void main_widget::show_result(std::vector<std::vector<QString>> const & groups) 
     process_widget->set_file_deletetion_enabled(true);
 }
 
-std::vector<QString> main_widget::get_roots() {
-    std::vector<QString> roots;
-    for (int32_t i = 0; i < ui->directories->count(); ++i) {
-        QString current_directory = ui->directories->item(i)->text();
-        QDir directory(current_directory);
-        if (!directory.exists() || !directory.isReadable()) {
-            errors.push_back("Unable to access \"" + current_directory + "\" directory");
-        } else {
-            roots.push_back(current_directory);
-        }
-    }
-    return roots;
-}
-
 void main_widget::stop_search() {
+    scanner->stop();
     scanner->wait();
     scanner->deleteLater();
 }
@@ -139,9 +140,8 @@ void main_widget::stop_search_and_close() {
 
 void main_widget::stop_and_reload() {
     stop_search();
+    this->show();
     process_widget->hide();
-    show();
-    process_widget.reset();
     clear_workspace();
 }
 

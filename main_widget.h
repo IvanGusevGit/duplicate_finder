@@ -11,7 +11,6 @@
 
 namespace Ui {
 class main_widget;
-class process;
 }
 
 class main_widget : public QWidget
@@ -37,10 +36,6 @@ private slots:
 
     void stop_and_reload();
 
-signals:
-
-    void search_finished();
-
 private:
 
     void show_message(QString message);
@@ -49,13 +44,14 @@ private:
 
     std::vector<QString>* scan_directories();
 
+    std::vector<QString> get_roots();
+
     void calc_hashes(std::vector<QString>& files);
 
     void stop_search();
 
     void clear_workspace();
 
-    std::vector<QString> get_roots();
 
     std::unique_ptr<Ui::main_widget> ui;
     std::unique_ptr<process> process_widget;

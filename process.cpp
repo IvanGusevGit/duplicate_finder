@@ -73,8 +73,6 @@ void process::delete_selected_files()
 }
 
 void process::set_limit(quint64 limit) {
-    std::cout << "SET LIMIT::" << limit << '\n';
-    std::cout.flush();
     total = limit;
     if (limit == 0) {
         ui->progress_bar->setRange(0, 0);
@@ -82,9 +80,8 @@ void process::set_limit(quint64 limit) {
         ui->progress_bar->setRange(0, 100);
     }
 }
+
 void process::increase_status(qint64 t) {
-    std::cout << "PASSED::" << t << '\n';
-    std::cout.flush();
     current += t;
     if (total != 0) {
         ui->progress_bar->setValue(current * 100 / total);
